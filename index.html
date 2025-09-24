@@ -1,15 +1,51 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- meta tags, links to css, etc. -->
     <meta charset="utf-8">
-    <title>On the Grid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div class="container">
+        <div class="left-section">
+            <h2>Company News</h2>
+            <div class="search-section">
+                <input type="text" id="company-search" placeholder="Enter company name..." class="search-input">
+                <button id="search-btn" class="search-button">Search</button>
+            </div>
+            <div id="news-container" class="news-container">
+                <div class="news-placeholder">
+                    <p>search for a company to see latest financial news</p>
+                </div>
+            </div>
+        </div>
 
-    <!-- visible content goes here -->
-    <h1>On the Grid</h1>
-	<p>See README.md for info</p>
+        <div class="right-section">
+            <div class="chart-quarter">
+                <h3>AAPL - Apple Inc.</h3>
+                <span class="stock-price" id="price-1">Loading...</span>
+                <canvas id="chart-1"></canvas>
+            </div>
+            <div class="chart-quarter">
+                <h3>GOOGL - Alphabet Inc.</h3>
+                <span class="stock-price" id="price-2">Loading...</span>
+                <canvas id="chart-2"></canvas>
+            </div>
+            <div class="chart-quarter">
+                <h3>MSFT - Microsoft Corp.</h3>
+                <span class="stock-price" id="price-3">Loading...</span>
+                <canvas id="chart-3"></canvas>
+            </div>
+            <div class="chart-quarter">
+                <h3>TSLA - Tesla Inc.</h3>
+                <span class="stock-price" id="price-4">Loading...</span>
+                <canvas id="chart-4"></canvas>
+            </div>
+        </div>
+    </div>
 
+    <script src="assets/js/main.js"></script>
 </body>
 </html>
