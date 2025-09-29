@@ -373,9 +373,12 @@ function displayNews(articles) {
     
     const newsHTML = articles.map(article => `
         <div class="news-item">
-            <h4>${article.title}</h4>
+            <h4><a href="${article.url}" target="_blank" rel="noopener noreferrer">${article.title}</a></h4>
             <p>${article.description}</p>
-            <div class="news-date">${new Date(article.date).toLocaleDateString()}</div>
+            <div class="news-date">
+                ${new Date(article.publishedAt || article.date).toLocaleDateString()} 
+                ${article.source ? `• ${article.source}` : ''}
+            </div>
         </div>
     `).join('');
 
