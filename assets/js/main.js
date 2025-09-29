@@ -3,6 +3,39 @@
 
 const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA'];
 const charts = {};
+let currentCompany = null;
+
+// new chart configs for different financial data types
+const chartConfigs = [
+    {
+        type: 'line',
+        title: 'Stock Price',
+        dataType: 'price',
+        color: '#00d4aa',
+        backgroundColor: 'rgba(0, 212, 170, 0.1)'
+    },
+    {
+        type: 'bar',
+        title: 'Trading Volume',
+        dataType: 'volume',
+        color: '#e74c3c',
+        backgroundColor: 'rgba(231, 76, 60, 0.6)'
+    },
+    {
+        type: 'line',
+        title: 'Market Cap',
+        dataType: 'marketCap',
+        color: '#f39c12',
+        backgroundColor: 'rgba(243, 156, 18, 0.1)'
+    },
+    {
+        type: 'bar',
+        title: 'Revenue Growth',
+        dataType: 'revenue',
+        color: '#9b59b6',
+        backgroundColor: 'rgba(155, 89, 182, 0.6)'
+    }
+];
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeCharts();
