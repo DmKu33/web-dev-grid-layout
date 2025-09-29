@@ -47,30 +47,30 @@ function setupEventListeners() {
     const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('company-search');
 
-    searchBtn.addEventListener('click', searchCompanyNews);
+    searchBtn.addEventListener('click', searchCompanyData);
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            searchCompanyNews();
+            searchCompanyData();
         }
     });
 }
 
 // initialize empty charts
 function initializeCharts() {
-    stockSymbols.forEach((symbol, index) => {
+    chartConfigs.forEach((config, index) => {
         const ctx = document.getElementById(`chart-${index + 1}`).getContext('2d');
         
-        charts[symbol] = new Chart(ctx, {
-            type: 'line',
+        charts[`chart-${index + 1}`] = new Chart(ctx, {
+            type: config.type,
             data: {
                 labels: [],
                 datasets: [{
-                    label: `${symbol} Price`,
+                    label: config.title,
                     data: [],
-                    borderColor: '#00d4aa',
-                    backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                    borderColor: config.color,
+                    backgroundColor: config.backgroundColor,
                     borderWidth: 2,
-                    fill: true,
+                    fill: config.type === 'line',
                     tension: 0.4
                 }]
             },
@@ -106,7 +106,7 @@ function initializeCharts() {
                 },
                 elements: {
                     point: {
-                        radius: 0,
+                        radius: config.type === 'line' ? 0 : undefined,
                         hoverRadius: 4
                     }
                 }
