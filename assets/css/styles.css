@@ -10,7 +10,7 @@
     --bg-secondary: #000000;
     --bg-tertiary: #3d3d3d;
     --text-primary: #ffffff;
-    --text-secondary: #b3b3b3;
+    --text-secondary: #a7a7a7;
     --accent-color: #00d4aa;
     --accent-hover: #00b894;
     --border-color: #ffffff;
@@ -77,7 +77,7 @@ body {
 
 .news-placeholder {
     text-align: center;
-    color: var(--text-secondary);
+    color: var(--text-secondary) !important;
     padding: 2rem;
 }
 
