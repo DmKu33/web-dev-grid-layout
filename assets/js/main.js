@@ -3,6 +3,7 @@
 
 const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA'];
 const charts = {};
+
 let currentCompany = null;
 
 // new chart configs for different financial data types
