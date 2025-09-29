@@ -1,3 +1,4 @@
+// Had Claude help debug and come up with some extra charts
 
 // financial dashboard
 
