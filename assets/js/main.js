@@ -48,10 +48,10 @@ function setupEventListeners() {
     const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('company-search');
 
-    searchBtn.addEventListener('click', searchCompanyData);
+    searchBtn.addEventListener('click', searchCompanyNews);
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            searchCompanyData();
+            searchCompanyNews();
         }
     });
 }
@@ -248,10 +248,90 @@ async function searchCompanyNews() {
 
     if (!query) return;
 
-    newsContainer.innerHTML = '<div class="loading">searching for news...</div>';
+    currentCompany = query.toUpperCase();
     
+    // updating news
+    newsContainer.innerHTML = '<div class="loading">searching for news...</div>';
     const mockNews = generateMockNews(query);
     displayNews(mockNews);
+    
+    // generating financial data for the company
+    const financialData = generateCompanyFinancialData(query);
+    
+    // updating all charts with different data types
+    updateAllChartsForCompany(financialData);
+}
+
+// updating all 4 charts with different financial data for the searched company
+function updateAllChartsForCompany(data) {
+    chartConfigs.forEach((config, index) => {
+        const chartIndex = index + 1;
+        const chartKey = `chart-${chartIndex}`;
+        const chart = charts[chartKey];
+        
+        if (!chart) return;
+        
+        const chartQuarter = document.querySelector(`#chart-${chartIndex}`).closest('.chart-quarter');
+        const header = chartQuarter.querySelector('h3');
+        const priceElement = chartQuarter.querySelector('.stock-price');
+        
+        header.textContent = `${data.symbol} - ${config.title}`;
+        
+        let chartData, priceDisplay, priceClass = 'stock-price';
+        
+        switch (config.dataType) {
+            case 'price':
+                chartData = data.prices;
+                const changeText = data.priceChange >= 0 ? `+${data.priceChange.toFixed(2)}` : data.priceChange.toFixed(2);
+                const changePercent = data.priceChangePercent >= 0 ? `+${data.priceChangePercent.toFixed(1)}%` : `${data.priceChangePercent.toFixed(1)}%`;
+                priceDisplay = `$${data.currentPrice.toFixed(2)} <small>(${changeText} | ${changePercent})</small>`;
+                priceClass = `stock-price ${data.priceChange >= 0 ? '' : 'negative'}`;
+                break;
+                
+            case 'volume':
+                chartData = data.volumes;
+                const avgVolume = data.volumes.reduce((a, b) => a + b, 0) / data.volumes.length;
+                const latestVolume = data.volumes[data.volumes.length - 1];
+                priceDisplay = `${(latestVolume / 1000000).toFixed(1)}M <small>Avg: ${(avgVolume / 1000000).toFixed(1)}M</small>`;
+                break;
+                
+            case 'marketCap':
+                chartData = data.marketCaps;
+                const currentMarketCap = data.marketCaps[data.marketCaps.length - 1];
+                const prevMarketCap = data.marketCaps[data.marketCaps.length - 2];
+                const marketCapChange = currentMarketCap - prevMarketCap;
+                const marketCapChangeText = marketCapChange >= 0 ? `+${marketCapChange.toFixed(1)}B` : `${marketCapChange.toFixed(1)}B`;
+                priceDisplay = `${currentMarketCap.toFixed(1)}B <small>(${marketCapChangeText})</small>`;
+                priceClass = `stock-price ${marketCapChange >= 0 ? '' : 'negative'}`;
+                break;
+                
+            case 'revenue':
+                chartData = data.revenues;
+                const currentRevenue = data.revenues[data.revenues.length - 1];
+                const avgRevenue = data.revenues.reduce((a, b) => a + b, 0) / data.revenues.length;
+                const revenueGrowth = ((currentRevenue - avgRevenue) / avgRevenue * 100);
+                const growthText = revenueGrowth >= 0 ? `+${revenueGrowth.toFixed(1)}%` : `${revenueGrowth.toFixed(1)}%`;
+                priceDisplay = `${currentRevenue.toFixed(1)}B <small>(${growthText})</small>`;
+                priceClass = `stock-price ${revenueGrowth >= 0 ? '' : 'negative'}`;
+                break;
+                
+            default:
+                chartData = data.prices;
+                priceDisplay = 'Loading...';
+        }
+        
+        priceElement.innerHTML = priceDisplay;
+        priceElement.className = priceClass;
+        
+        chart.data.labels = data.dates;
+        chart.data.datasets[0].data = chartData;
+        chart.data.datasets[0].label = `${data.symbol} ${config.title}`;
+        
+        chart.data.datasets[0].borderColor = config.color;
+        chart.data.datasets[0].backgroundColor = config.backgroundColor;
+        
+        chart.update();
+    });
 }
 
 // generated mock news data with Claude
