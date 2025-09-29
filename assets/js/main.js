@@ -154,45 +154,78 @@ async function loadStockData() {
     });
 }
 
-function generateMockStockData(symbol) {
-    const basePrice = {
-        'AAPL': 150,
-        'GOOGL': 2800,
-        'MSFT': 300,
-        'TSLA': 800
-    }[symbol] || 100;
+function generateCompanyFinancialData(companyName) {
+    const symbol = companyName.toUpperCase();
+    
+    // base values for different companies
+    const companyData = {
+        'APPLE': { basePrice: 175, marketCap: 2800, baseVolume: 50000000 },
+        'MICROSOFT': { basePrice: 380, marketCap: 2500, baseVolume: 25000000 },
+        'TESLA': { basePrice: 250, marketCap: 800, baseVolume: 80000000 },
+        'GOOGLE': { basePrice: 140, marketCap: 1700, baseVolume: 30000000 },
+        'AMAZON': { basePrice: 145, marketCap: 1500, baseVolume: 35000000 },
+        'META': { basePrice: 320, marketCap: 800, baseVolume: 20000000 },
+        'NVIDIA': { basePrice: 450, marketCap: 1100, baseVolume: 45000000 }
+    };
+    
+    // default values for unknown companies
+    const data = companyData[symbol] || { 
+        basePrice: 100 + Math.random() * 200, 
+        marketCap: 500 + Math.random() * 1000, 
+        baseVolume: 10000000 + Math.random() * 40000000 
+    };
 
     const dates = [];
     const prices = [];
+    const volumes = [];
+    const marketCaps = [];
+    const revenues = [];
     const now = new Date();
 
     for (let i = 29; i >= 0; i--) {
         const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         dates.push(date.toLocaleDateString());
         
-        const randomChange = (Math.random() - 0.5) * 0.1;
-        const price = basePrice * (1 + randomChange + Math.sin(i * 0.2) * 0.05);
-        prices.push(price.toFixed(2));
+        // Stock Price (with trend and volatility)
+        const priceVolatility = (Math.random() - 0.5) * 0.08;
+        const priceTrend = Math.sin(i * 0.1) * 0.03;
+        const price = data.basePrice * (1 + priceVolatility + priceTrend);
+        prices.push(parseFloat(price.toFixed(2)));
+        
+        // Trading Volume (inverse correlation with price sometimes)
+        const volumeVariation = (Math.random() - 0.5) * 0.4;
+        const volume = data.baseVolume * (1 + volumeVariation);
+        volumes.push(Math.floor(volume));
+        
+        // Market Cap (generally follows stock price)
+        const marketCapVariation = (Math.random() - 0.5) * 0.06;
+        const marketCap = data.marketCap * (1 + marketCapVariation + priceTrend * 0.5);
+        marketCaps.push(parseFloat(marketCap.toFixed(1)));
+        
+        // Revenue Growth (quarterly-like pattern)
+        const revenueBase = 50 + Math.random() * 100;
+        const seasonality = Math.sin((i / 30) * 2 * Math.PI) * 10;
+        const growth = revenueBase + seasonality + (Math.random() - 0.5) * 15;
+        revenues.push(parseFloat(Math.max(growth, 5).toFixed(1)));
     }
 
-    const currentPrice = parseFloat(prices[prices.length - 1]);
-    const previousPrice = parseFloat(prices[prices.length - 2]);
-    const change = currentPrice - previousPrice;
+    const currentPrice = prices[prices.length - 1];
+    const previousPrice = prices[prices.length - 2];
+    const priceChange = currentPrice - previousPrice;
+    const priceChangePercent = (priceChange / previousPrice) * 100;
 
     return {
+        symbol,
         dates,
         prices,
+        volumes,
+        marketCaps,
+        revenues,
         currentPrice,
-        change
+        previousPrice,
+        priceChange,
+        priceChangePercent
     };
-}
-
-function updateChart(symbol, data) {
-    if (charts[symbol]) {
-        charts[symbol].data.labels = data.dates;
-        charts[symbol].data.datasets[0].data = data.prices;
-        charts[symbol].update();
-    }
 }
 
 function updateStockPrice(chartNumber, price, change) {
