@@ -117,11 +117,36 @@ function initializeCharts() {
 }
 
 async function loadStockData() {
+    // preset companies
     stockSymbols.forEach(async (symbol, index) => {
         try {
-            const mockData = generateMockStockData(symbol);
-            updateChart(symbol, mockData);
-            updateStockPrice(index + 1, mockData.currentPrice, mockData.change);
+            const financialData = generateCompanyFinancialData(symbol);
+            const chartIndex = index + 1;
+            const config = chartConfigs[index];
+            
+            if (config && charts[`chart-${chartIndex}`]) {
+                // updating chart title
+                const chartQuarter = document.querySelector(`#chart-${chartIndex}`).closest('.chart-quarter');
+                const header = chartQuarter.querySelector('h3');
+                header.textContent = `${symbol} - ${config.title}`;
+                
+                // updating chart with appropriate data
+                let chartData;
+                switch (config.dataType) {
+                    case 'price': chartData = financialData.prices; break;
+                    case 'volume': chartData = financialData.volumes; break;
+                    case 'marketCap': chartData = financialData.marketCaps; break;
+                    case 'revenue': chartData = financialData.revenues; break;
+                    default: chartData = financialData.prices;
+                }
+                
+                const chart = charts[`chart-${chartIndex}`];
+                chart.data.labels = financialData.dates;
+                chart.data.datasets[0].data = chartData;
+                chart.update();
+                
+                updateStockPrice(chartIndex, financialData.currentPrice, financialData.priceChange);
+            }
         } catch (error) {
             console.error(`Error loading data for ${symbol}:`, error);
             updateStockPrice(index + 1, 'Error', 0);
